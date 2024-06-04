@@ -1,0 +1,30 @@
+package Villaruel.JohnRich;
+
+public static BigDecimal erf(BigDecimal x, int scale) {
+    // Precompute constants outside the loop for efficiency
+    BigDecimal two = BigDecimal.valueOf(2);
+    BigDecimal sqrtPi = BigDecimal.valueOf(Math.sqrt(Math.PI));
+
+    // Initialize variables
+    BigDecimal result = BigDecimal.ZERO;
+    BigDecimal term = x;
+    BigDecimal xSquared = x.multiply(x); // Precompute x^2 for performance
+    BigDecimal numerator = x;
+    BigDecimal denominator = BigDecimal.ONE;
+    int iteration = 0;
+    MathContext mc = new MathContext(scale);{
+
+    // Iteratively sum the terms of the series expansion of the error function
+    while (term.signum() != 0) { // Using signum for better performance
+        result = result.add(term);
+        // Update numerator and denominator for the next term
+        numerator = numerator.multiply(xSquared).negate(); // Update numerator using precomputed x^2
+        denominator = denominator.add(two); // Update denominator by adding 2
+        term = numerator.divide(denominator.multiply(BigDecimal.valueOf(iteration + 1)), mc);
+        iteration++;
+    }
+
+    // Multiply the result by 2 and divide by sqrt(pi) to get the final value of erf(x)
+    return result.multiply(BigDecimal.valueOf(2)).divide(sqrtPi, mc);
+}
+}
